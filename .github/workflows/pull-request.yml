@@ -1,0 +1,92 @@
+name: CDK Diff on PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  cdk-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_VIEW_ONLY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: CDK Diff
+        id: cdk_diff
+        run: npx cdk diff --all --fail &> diff.txt
+        continue-on-error: true
+
+      - name: Post PR comment
+        uses: actions/github-script@v7
+        env:
+          DIFF_OUTCOME: ${{ steps.cdk_diff.outcome }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const issue_number = context.issue.number;
+            const repo = context.repo;
+            const bot_comment_marker = '<!-- cdk-diff-bot -->';
+
+            let body;
+            if (process.env.DIFF_OUTCOME === 'failure') {
+              const diffOutput = fs.readFileSync('diff.txt', 'utf8').trim();
+              const header = `### CDK Diff\n\n${bot_comment_marker}\n\n`;
+              let formattedDiff = '```diff\n' + diffOutput + '\n```';
+              if (diffOutput.length === 0) {
+                formattedDiff = 'An error occurred during `cdk diff`. Please check the workflow logs for details.';
+              }
+              const maxCommentLength = 65536;
+
+              if (header.length + formattedDiff.length > maxCommentLength) {
+                const footer = '\n... (diff truncated)\n```';
+                const truncatedDiff = diffOutput.substring(0, maxCommentLength - header.length - footer.length);
+                body = header + '```diff\n' + truncatedDiff + footer;
+              } else {
+                body = header + formattedDiff;
+              }
+            } else {
+              body = `✅ No infrastructure changes detected.\n\n${bot_comment_marker}`;
+            }
+
+            const { data: comments } = await github.rest.issues.listComments({
+              ...repo,
+              issue_number,
+            });
+
+            const existing_comment = comments.find(c => c.body.includes(bot_comment_marker));
+
+            if (existing_comment) {
+              await github.rest.issues.updateComment({
+                ...repo,
+                comment_id: existing_comment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                ...repo,
+                issue_number,
+                body,
+              });
+            }
