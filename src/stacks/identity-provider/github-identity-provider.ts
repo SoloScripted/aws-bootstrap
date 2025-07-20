@@ -1,6 +1,5 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import { Construct } from 'constructs';
 
 interface GitHubRoleProps {
   readonly subConditions: string | string[];
@@ -12,8 +11,7 @@ interface GitHubRoleProps {
 const ORG_NAME = 'SoloScripted';
 const PIPELINE_REPOSITORIES = ['aws-bootstrap'];
 const ADMIN_POLICIES = ['AdministratorAccess'];
-const VIEW_ONLY_POLICIES = ['job-function/ViewOnlyAccess', 'AWSCloudFormationReadOnlyAccess']
-
+const VIEW_ONLY_POLICIES = ['job-function/ViewOnlyAccess', 'AWSCloudFormationReadOnlyAccess'];
 
 export class GitHubOidcConstruct extends Construct {
   public readonly provider: iam.OpenIdConnectProvider;
@@ -36,7 +34,9 @@ export class GitHubOidcConstruct extends Construct {
     });
 
     this.adminRole = this.createGithubRole('AdminRole', {
-      subConditions: PIPELINE_REPOSITORIES.map((repo) => `repo:${ORG_NAME}/${repo}:environment:production`),
+      subConditions: PIPELINE_REPOSITORIES.map(
+        (repo) => `repo:${ORG_NAME}/${repo}:environment:production`,
+      ),
       roleDescription: 'Admin role assumed by GitHub Actions for main branch deployments',
       outputDescription: 'The ARN of the IAM admin role for GitHub Actions',
       policies: ADMIN_POLICIES,
@@ -48,11 +48,11 @@ export class GitHubOidcConstruct extends Construct {
       assumedBy: new iam.FederatedPrincipal(
         this.provider.openIdConnectProviderArn,
         { StringLike: { 'token.actions.githubusercontent.com:sub': props.subConditions } },
-        'sts:AssumeRoleWithWebIdentity'
+        'sts:AssumeRoleWithWebIdentity',
       ),
       description: props.roleDescription,
-      managedPolicies: props.policies.map(
-        (policyName) => iam.ManagedPolicy.fromAwsManagedPolicyName(policyName)
+      managedPolicies: props.policies.map((policyName) =>
+        iam.ManagedPolicy.fromAwsManagedPolicyName(policyName),
       ),
     });
 

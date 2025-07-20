@@ -10,4 +10,4 @@ const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_
 new IamStack(app, 'IamStack', { env });
 new StorageStack(app, 'StorageStack', { env });
 
-app.synth()
+app.synth();

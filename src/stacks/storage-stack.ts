@@ -6,7 +6,7 @@ export class StorageStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const terraformState = new TerraformStateBucket(this, 'TerraformStateBucket',{
+    const terraformState = new TerraformStateBucket(this, 'TerraformStateBucket', {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 

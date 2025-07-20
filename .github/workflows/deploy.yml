@@ -26,13 +26,13 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: make install
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ADMIN_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
-          
+
       - name: CDK Deploy
-        run: npx cdk deploy --all --require-approval never
+        run: make deploy STACK="--all"
