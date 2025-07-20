@@ -6,13 +6,14 @@ interface GitHubRoleProps {
   readonly subConditions: string | string[];
   readonly roleDescription: string;
   readonly outputDescription: string;
-  readonly allowDeployment: boolean;
+  readonly policies: string[];
 }
 
 const ORG_NAME = 'SoloScripted';
 const PIPELINE_REPOSITORIES = ['aws-bootstrap'];
-const ADMIN_POLICY = 'AdministratorAccess';
-const VIEW_ONLY_POLICY = 'job-function/ViewOnlyAccess';
+const ADMIN_POLICIES = ['AdministratorAccess'];
+const VIEW_ONLY_POLICIES = ['job-function/ViewOnlyAccess', 'AWSCloudFormationReadOnlyAccess']
+
 
 export class GitHubOidcConstruct extends Construct {
   public readonly provider: iam.OpenIdConnectProvider;
@@ -31,7 +32,7 @@ export class GitHubOidcConstruct extends Construct {
       subConditions: `repo:${ORG_NAME}/*:*`,
       roleDescription: 'Role assumed by GitHub Actions for read-only operations',
       outputDescription: 'The ARN of the IAM role for GitHub Actions',
-      allowDeployment: false,
+      policies: VIEW_ONLY_POLICIES,
     });
 
     this.adminRole = this.createGithubRole('AdminRole', {
@@ -40,7 +41,7 @@ export class GitHubOidcConstruct extends Construct {
       ),
       roleDescription: 'Admin role assumed by GitHub Actions for main branch deployments',
       outputDescription: 'The ARN of the IAM admin role for GitHub Actions',
-      allowDeployment: true,
+      policies: ADMIN_POLICIES,
     });
   }
 
@@ -52,7 +53,9 @@ export class GitHubOidcConstruct extends Construct {
         'sts:AssumeRoleWithWebIdentity'
       ),
       description: props.roleDescription,
-      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName(props.allowDeployment ? ADMIN_POLICY : VIEW_ONLY_POLICY)],
+      managedPolicies: props.policies.map(
+        (policyName) => iam.ManagedPolicy.fromAwsManagedPolicyName(policyName)
+      ),
     });
 
     return role;
