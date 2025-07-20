@@ -9,7 +9,7 @@ interface GitHubRoleProps {
   readonly allowDeployment: boolean;
 }
 
-const ORG_NAME = 'soloscripted';
+const ORG_NAME = 'SoloScripted';
 const PIPELINE_REPOSITORIES = ['aws-bootstrap'];
 const ADMIN_POLICY = 'AdministratorAccess';
 const VIEW_ONLY_POLICY = 'job-function/ViewOnlyAccess';
