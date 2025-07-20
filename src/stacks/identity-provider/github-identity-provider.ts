@@ -36,9 +36,7 @@ export class GitHubOidcConstruct extends Construct {
     });
 
     this.adminRole = this.createGithubRole('AdminRole', {
-      subConditions: PIPELINE_REPOSITORIES.map(
-        (repo) => `repo:${ORG_NAME}/${repo}:ref:refs/heads/main`
-      ),
+      subConditions: PIPELINE_REPOSITORIES.map((repo) => `repo:${ORG_NAME}/${repo}:environment:production`),
       roleDescription: 'Admin role assumed by GitHub Actions for main branch deployments',
       outputDescription: 'The ARN of the IAM admin role for GitHub Actions',
       policies: ADMIN_POLICIES,

@@ -30,7 +30,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_VIEW_ONLY_ROLE_ARN }}
-          aws-region: eu-north-1
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: CDK Diff
         id: cdk_diff
