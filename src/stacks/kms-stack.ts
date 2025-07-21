@@ -13,7 +13,7 @@ export class KmsStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
-    new cdk.CfnOutput(this, 'SopsKeyArn', {      
+    new cdk.CfnOutput(this, 'SopsKeyArn', {
       value: terraformSopsKey.key.keyArn,
       description: 'ARN of the KMS key for Terraform SOPS encryption',
     });

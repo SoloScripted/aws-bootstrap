@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
 import { IamStack } from './stacks/iam-stack';
-import { StorageStack } from './stacks/storage-stack';
 import { KmsStack } from './stacks/kms-stack';
+import { StorageStack } from './stacks/storage-stack';
+
 
 const app = new cdk.App();
 
