@@ -1,3 +1,12 @@
 {
-  "acknowledged-issue-numbers": [34635, 34892]
+  "acknowledged-issue-numbers": [34635, 34892],
+  "availability-zones:account=051008159209:region=eu-north-1": [
+    "eu-north-1a",
+    "eu-north-1b",
+    "eu-north-1c"
+  ],
+  "hosted-zone:account=051008159209:domainName=soloscripted.com:region=eu-north-1": {
+    "Id": "/hostedzone/Z09669812DPOEMPOQEHI2",
+    "Name": "soloscripted.com."
+  }
 }
