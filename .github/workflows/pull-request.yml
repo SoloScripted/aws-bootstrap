@@ -46,7 +46,7 @@ jobs:
         run: make install
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ secrets.AWS_VIEW_ONLY_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
