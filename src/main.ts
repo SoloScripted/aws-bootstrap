@@ -11,8 +11,8 @@ const app = new cdk.App();
 const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION };
 
 const security = new SecurityStack(app, 'SecurityStack', { env });
-const network = new NetworkStack(app, 'NetworkStack', { env }, false);
 new StorageStack(app, 'StorageStack', { env });
+const network = new NetworkStack(app, 'NetworkStack', { env }, true);
 new AtlantisStack(
   app,
   'AtlantisStack',
@@ -24,7 +24,7 @@ new AtlantisStack(
       security.googleUserPoolIdentityProvider.providerName,
     ),
   },
-  false,
+  true,
 );
 
 app.synth();
